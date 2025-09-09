@@ -1,0 +1,207 @@
+definitions:
+  github_com_oatsmoke_20250905_internal_model.Subscription:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Users online subscriptions
+  version: "1.0"
+paths:
+  /subscriptions:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+            type: array
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: List subscriptions
+      tags:
+      - subscription
+    post:
+      parameters:
+      - description: Subscription
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Create subscription
+      tags:
+      - subscription
+  /subscriptions/{id}:
+    delete:
+      parameters:
+      - description: ID subscription
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Delete subscription
+      tags:
+      - subscription
+    get:
+      parameters:
+      - description: ID subscription
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Read subscription
+      tags:
+      - subscription
+    put:
+      parameters:
+      - description: ID subscription
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Subscription
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Update subscription
+      tags:
+      - subscription
+  /subscriptions/total:
+    get:
+      parameters:
+      - description: user ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      - description: service name
+        in: query
+        name: service_name
+        required: true
+        type: string
+      - description: start date
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: end date
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: bad request
+          schema:
+            type: string
+        "405":
+          description: method not allowed
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Total subscriptions
+      tags:
+      - subscription
+swagger: "2.0"
