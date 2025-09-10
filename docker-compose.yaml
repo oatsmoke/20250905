@@ -1,0 +1,42 @@
+services:
+
+  postgres_db:
+    image: postgres:latest
+    container_name: postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d postgres -h localhost" ]
+
+  migrate:
+    image: arigaio/atlas:latest
+    container_name: migrate
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    command: >
+      migrate apply
+      --url postgres://root:password@postgres_db:5432/postgres?sslmode=disable
+    volumes:
+      - ./migrations:/migrations
+
+  api:
+    image: ghcr.io/oatsmoke/20250905/app:latest
+    container_name: api
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "8080:8080"
+    environment:
+      HTTP_PORT: :8080
+      POSTGRES_DSN: postgres://root:password@postgres_db:5432/postgres?sslmode=disable
+
+volumes:
+  postgres_data:

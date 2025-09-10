@@ -1,9 +1,10 @@
 definitions:
-  github_com_oatsmoke_20250905_internal_model.Subscription:
+  github_com_oatsmoke_20250905_internal_model.ExternalData:
     properties:
       end_date:
         type: string
       id:
+        format: int64
         type: integer
       price:
         type: integer
@@ -28,7 +29,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+              $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData'
             type: array
         "405":
           description: method not allowed
@@ -43,12 +44,12 @@ paths:
       - subscription
     post:
       parameters:
-      - description: Subscription
+      - description: external data
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData'
       produces:
       - application/json
       responses:
@@ -72,7 +73,7 @@ paths:
   /subscriptions/{id}:
     delete:
       parameters:
-      - description: ID subscription
+      - description: id subscription
         in: path
         name: id
         required: true
@@ -99,7 +100,7 @@ paths:
       - subscription
     get:
       parameters:
-      - description: ID subscription
+      - description: id subscription
         in: path
         name: id
         required: true
@@ -110,7 +111,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+            $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData'
         "400":
           description: bad request
           schema:
@@ -128,17 +129,17 @@ paths:
       - subscription
     put:
       parameters:
-      - description: ID subscription
+      - description: id subscription
         in: path
         name: id
         required: true
         type: integer
-      - description: Subscription
+      - description: external data
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription'
+          $ref: '#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData'
       produces:
       - application/json
       responses:

@@ -146,18 +146,20 @@ func (r *SubscriptionRepository) List(ctx context.Context) ([]*model.Subscriptio
 		return nil, err
 	}
 
-	logger.Info(fmt.Sprintf("%d subscriptions listed\n", len(subscriptions)))
+	logger.Info(fmt.Sprintf("%d subscriptions listed", len(subscriptions)))
 	return subscriptions, nil
 }
 
 func (r *SubscriptionRepository) Total(ctx context.Context, subscription *model.Subscription) (int64, error) {
 	var total int64
-	const query = `
+	const query = ` 
 		SELECT SUM(price) 
 		FROM subscriptions
-		WHERE start_date BETWEEN $3 AND $4
-		GROUP BY user_id, service_name
-		HAVING user_id = $1 AND service_name = $2;`
+		WHERE user_id = $1 
+		  AND service_name = $2 
+		  AND start_date <= $4
+		  AND (end_date IS NULL OR end_date >= $3)
+		GROUP BY user_id, service_name;`
 
 	if err := r.postgresDB.QueryRow(
 		ctx,

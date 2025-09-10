@@ -30,7 +30,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription"
+                                "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData"
                             }
                         }
                     },
@@ -58,12 +58,12 @@ const docTemplate = `{
                 "summary": "Create subscription",
                 "parameters": [
                     {
-                        "description": "Subscription",
+                        "description": "external data",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription"
+                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData"
                         }
                     }
                 ],
@@ -171,7 +171,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID subscription",
+                        "description": "id subscription",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -181,7 +181,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription"
+                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData"
                         }
                     },
                     "400": {
@@ -215,18 +215,18 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID subscription",
+                        "description": "id subscription",
                         "name": "id",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Subscription",
+                        "description": "external data",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.Subscription"
+                            "$ref": "#/definitions/github_com_oatsmoke_20250905_internal_model.ExternalData"
                         }
                     }
                 ],
@@ -265,7 +265,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID subscription",
+                        "description": "id subscription",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -298,14 +298,15 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_oatsmoke_20250905_internal_model.Subscription": {
+        "github_com_oatsmoke_20250905_internal_model.ExternalData": {
             "type": "object",
             "properties": {
                 "end_date": {
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "price": {
                     "type": "integer"

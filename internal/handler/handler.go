@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 
-	"github.com/oatsmoke/20250905/internal/domain"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -11,7 +10,7 @@ type Handler struct {
 	subscriptionHandler *SubscriptionHandler
 }
 
-func New(subscriptionService domain.Subscription) *Handler {
+func New(subscriptionService Subscription) *Handler {
 	return &Handler{
 		subscriptionHandler: NewSubscriptionHandler(subscriptionService),
 	}

@@ -1,22 +1,31 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/oatsmoke/20250905/internal/domain"
 	"github.com/oatsmoke/20250905/internal/lib/err_msg"
 	"github.com/oatsmoke/20250905/internal/lib/logger"
 	"github.com/oatsmoke/20250905/internal/model"
 )
 
-type SubscriptionHandler struct {
-	subscriptionService domain.Subscription
+type Subscription interface {
+	Create(ctx context.Context, data *model.ExternalData) error
+	Read(ctx context.Context, subscriptionId int64) (*model.ExternalData, error)
+	Update(ctx context.Context, subscriptionId int64, data *model.ExternalData) error
+	Delete(ctx context.Context, subscriptionId int64) error
+	List(ctx context.Context) ([]*model.ExternalData, error)
+	Total(ctx context.Context, data *model.ExternalData) (int64, error)
 }
 
-func NewSubscriptionHandler(subscriptionService domain.Subscription) *SubscriptionHandler {
+type SubscriptionHandler struct {
+	subscriptionService Subscription
+}
+
+func NewSubscriptionHandler(subscriptionService Subscription) *SubscriptionHandler {
 	return &SubscriptionHandler{
 		subscriptionService: subscriptionService,
 	}
@@ -26,7 +35,7 @@ func NewSubscriptionHandler(subscriptionService domain.Subscription) *Subscripti
 // @Summary Create subscription
 // @Tags subscription
 // @Produce json
-// @Param request body model.Subscription true "Subscription"
+// @Param request body model.ExternalData true "external data"
 // @Success 201
 // @Failure 400 {object} string "bad request"
 // @Failure 405 {object} string "method not allowed"
@@ -38,13 +47,13 @@ func (h *SubscriptionHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	subscription := new(model.Subscription)
+	subscription := new(model.ExternalData)
 	if err := json.NewDecoder(r.Body).Decode(subscription); err != nil {
 		logger.HttpError(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if *subscription == (model.Subscription{}) {
+	if *subscription == (model.ExternalData{}) {
 		logger.HttpError(w, err_msg.RequestBodyIsEmpty, http.StatusBadRequest)
 		return
 	}
@@ -61,8 +70,8 @@ func (h *SubscriptionHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Summary Read subscription
 // @Tags subscription
 // @Produce json
-// @Param id path int true "ID subscription"
-// @Success 200 {object} model.Subscription
+// @Param id path int true "id subscription"
+// @Success 200 {object} model.ExternalData
 // @Failure 400 {object} string "bad request"
 // @Failure 405 {object} string "method not allowed"
 // @Failure 500 {object} string "internal server error"
@@ -95,8 +104,8 @@ func (h *SubscriptionHandler) Read(w http.ResponseWriter, r *http.Request) {
 // @Summary Update subscription
 // @Tags subscription
 // @Produce json
-// @Param id path int true "ID subscription"
-// @Param request body model.Subscription true "Subscription"
+// @Param id path int true "id subscription"
+// @Param request body model.ExternalData true "external data"
 // @Success 204
 // @Failure 400 {object} string "bad request"
 // @Failure 405 {object} string "method not allowed"
@@ -108,25 +117,24 @@ func (h *SubscriptionHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := strconv.ParseInt(strings.TrimPrefix(r.URL.Path, "/subscriptions/"), 10, 64)
+	subscriptionId, err := strconv.ParseInt(strings.TrimPrefix(r.URL.Path, "/subscriptions/"), 10, 64)
 	if err != nil {
 		logger.HttpError(w, err, http.StatusBadRequest)
 		return
 	}
 
-	subscription := new(model.Subscription)
+	subscription := new(model.ExternalData)
 	if err := json.NewDecoder(r.Body).Decode(subscription); err != nil {
 		logger.HttpError(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if *subscription == (model.Subscription{}) {
+	if *subscription == (model.ExternalData{}) {
 		logger.HttpError(w, err_msg.RequestBodyIsEmpty, http.StatusBadRequest)
 		return
 	}
 
-	subscription.ID = id
-	if err := h.subscriptionService.Update(r.Context(), subscription); err != nil {
+	if err := h.subscriptionService.Update(r.Context(), subscriptionId, subscription); err != nil {
 		logger.HttpError(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -138,7 +146,7 @@ func (h *SubscriptionHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Summary Delete subscription
 // @Tags subscription
 // @Produce json
-// @Param id path int true "ID subscription"
+// @Param id path int true "id subscription"
 // @Success 204
 // @Failure 400 {object} string "bad request"
 // @Failure 405 {object} string "method not allowed"
@@ -168,7 +176,7 @@ func (h *SubscriptionHandler) Delete(w http.ResponseWriter, r *http.Request) {
 // @Summary List subscriptions
 // @Tags subscription
 // @Produce json
-// @Success 200 {array} model.Subscription
+// @Success 200 {array} model.ExternalData
 // @Failure 405 {object} string "method not allowed"
 // @Failure 500 {object} string "internal server error"
 // @Router /subscriptions [get]
@@ -220,7 +228,7 @@ func (h *SubscriptionHandler) Total(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total, err := h.subscriptionService.Total(r.Context(), &model.Subscription{
+	total, err := h.subscriptionService.Total(r.Context(), &model.ExternalData{
 		UserId:      userId,
 		ServiceName: serviceName,
 		StartDate:   startDate,
