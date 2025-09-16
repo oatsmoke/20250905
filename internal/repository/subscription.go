@@ -153,13 +153,21 @@ func (r *SubscriptionRepository) List(ctx context.Context) ([]*model.Subscriptio
 func (r *SubscriptionRepository) Total(ctx context.Context, subscription *model.Subscription) (int64, error) {
 	var total int64
 	const query = ` 
-		SELECT SUM(price) 
+		SELECT sum((
+		           extract(YEAR FROM age(
+		                   CASE WHEN end_date IS NULL OR end_date >= $4 THEN $4 ELSE end_date END,
+		                   CASE WHEN start_date <= $3 THEN $3 ELSE start_date END
+		                             )) * 12 +
+		           extract(MONTH FROM age(
+		                   CASE WHEN end_date IS NULL OR end_date >= $4 THEN $4 ELSE end_date END,
+		                   CASE WHEN start_date <= $3 THEN $3 ELSE start_date END
+		                              ))
+		           ) * price)
 		FROM subscriptions
-		WHERE user_id = $1 
-		  AND service_name = $2 
-		  AND start_date <= $4
-		  AND (end_date IS NULL OR end_date >= $3)
-		GROUP BY user_id, service_name;`
+		WHERE user_id = $1
+		  AND service_name = $2
+		  AND start_date < $4
+		  AND (end_date IS NULL OR end_date > $3);`
 
 	if err := r.postgresDB.QueryRow(
 		ctx,

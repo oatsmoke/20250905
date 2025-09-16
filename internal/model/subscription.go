@@ -12,7 +12,7 @@ type Subscription struct {
 }
 
 type ExternalData struct {
-	ID          int64
+	ID          int64  `json:"id"`
 	ServiceName string `json:"service_name"`
 	Price       int64  `json:"price"`
 	UserId      string `json:"user_id"`
